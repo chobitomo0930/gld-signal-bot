@@ -1,0 +1,62 @@
+name: GLD Signal Check
+
+# ============================================
+# 実行スケジュール
+# ============================================
+on:
+  schedule:
+    # 米国市場の取引時間をカバー（時刻はUTC基準）
+    #
+    # UTC 14:30 = JST 23:30（米国市場オープン直後）
+    # UTC 18:30 = JST 翌3:30（米国市場中盤）
+    # UTC 22:30 = JST 翌7:30（米国市場クローズ後）
+    # UTC 02:30 = JST 11:30（プレマーケット確認）
+    #
+    # 月〜金のみ実行（土日は米国市場が休場）
+    - cron: '30 14,18,22 * * 1-5'
+    - cron: '30 2 * * 2-6'
+
+  # 手動実行を可能にする設定（テスト用）
+  workflow_dispatch:
+
+# ============================================
+# ジョブ定義
+# ============================================
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  check-signal:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      # ステップ1: リポジトリのコードを取得
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ステップ2: Python 3.11 をセットアップ
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      # ステップ3: パッケージのキャッシュ（2回目以降の実行を高速化）
+      - name: Cache pip packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      # ステップ4: 必要なPythonパッケージをインストール
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      # ステップ5: シグナルチェックを実行
+      - name: Run GLD signal check
+        env:
+          LINE_CHANNEL_ACCESS_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
+          LINE_USER_ID: ${{ secrets.LINE_USER_ID }}
+        run: python gld_signal.py

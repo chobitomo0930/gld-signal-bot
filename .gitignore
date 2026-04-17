@@ -1,0 +1,10 @@
+# バックテスト用スクリプト（本番不要）
+backtest_*.py
+
+# クローンした参照用リポジトリ
+temp-soxl-signal-bot/
+
+# Python
+__pycache__/
+*.pyc
+.env
