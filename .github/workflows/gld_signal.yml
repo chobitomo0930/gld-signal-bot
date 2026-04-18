@@ -29,6 +29,9 @@ jobs:
   check-signal:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    # state.json を commit/push するために write 権限が必要
+    permissions:
+      contents: write
 
     steps:
       # ステップ1: リポジトリのコードを取得
