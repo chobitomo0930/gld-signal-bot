@@ -1,8 +1,8 @@
 {
-  "position": false,
-  "entry_price": 0.0,
-  "entry_date": "",
-  "peak_price": 0.0,
-  "stop_loss_price": 0.0,
+  "position": true,
+  "entry_price": 420.76,
+  "entry_date": "2026-04-29",
+  "peak_price": 420.76,
+  "stop_loss_price": 391.31,
   "shares": 0
 }
